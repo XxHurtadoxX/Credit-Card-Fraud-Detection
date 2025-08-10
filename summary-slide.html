@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Credit Card Fraud Detection — Resumen Ejecutivo</title>
+  <style>
+    :root {
+      /* Branding EA Tech Company: negro elegante, acentos sutiles, texto luminoso */
+      --bg: #000000;
+      --panel: #0a0a0a;
+      --card: #0a0a0a;
+      --muted: #c7c7c7;
+      --text: #ffffff;
+      --accent: #ffffff;       /* acento blanco luminoso */
+      --accent-2: #b3b3b3;     /* acento secundario gris claro */
+      --ok: #22c55e;           /* se mantienen KPIs verdes */
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --shadow: 0 12px 40px rgba(0,0,0,.45);
+      --radius: 16px;
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      overflow: hidden; /* sin scroll en desktop */
+      background: radial-gradient(1000px 700px at 80% -10%, #0f0f0f 0%, var(--bg) 60%), radial-gradient(800px 600px at 10% 110%, #0b0b0b 0%, #000 70%), var(--bg);
+    }
+    .slide {
+      box-sizing: border-box;
+      height: 100vh; width: 100vw; padding: 18px 22px; display: grid;
+      grid-template-rows: auto 1fr auto; gap: 12px;
+    }
+    /* Figuras blancas elegantes en el fondo */
+    .decor {
+      pointer-events: none; position: fixed; inset: 0; overflow: hidden; z-index: 0;
+    }
+    .blob { position: absolute; filter: blur(40px); opacity: .08; }
+    .blob.one { width: 420px; height: 420px; left: -120px; top: -140px; background: radial-gradient(circle at 50% 50%, #ffffff 0%, transparent 60%); }
+    .blob.two { width: 360px; height: 360px; right: -100px; bottom: -120px; background: radial-gradient(circle at 50% 50%, #ffffff 0%, transparent 65%); }
+    .blob.three { width: 260px; height: 260px; right: 20%; top: 18%; background: radial-gradient(circle at 50% 50%, #ffffff 0%, transparent 70%); opacity:.06; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.12); padding: 10px 14px; border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative; z-index: 1;
+    }
+    .title { display: flex; gap: 12px; align-items: center; }
+    .title h1 { font-size: clamp(18px, 2.4vw, 28px); margin: 0; font-weight: 800; letter-spacing: .3px; text-shadow: 0 0 6px rgba(255,255,255,.35), 0 0 18px rgba(255,255,255,.15); }
+    .badge { font-size: 12px; color: var(--text); padding: 6px 10px; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; backdrop-filter: blur(4px); background: rgba(255,255,255,.05); display:inline-flex; align-items:center; gap:8px; }
+  .logo { height: 56px; width: auto; display:block; }
+  .logo-fallback { height: 56px; padding: 6px 14px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; font-weight: 800; letter-spacing:.5px; text-shadow: 0 0 8px rgba(255,255,255,.35); display:flex; align-items:center; }
+  .mini { height: 16px; width: auto; display:block; filter: contrast(1.1) brightness(1.1); }
+  .mini-badge { display:inline-flex; align-items:center; justify-content:center; width: 18px; height: 18px; border:1px solid rgba(255,255,255,.25); border-radius: 4px; font-size: 10px; font-weight: 800; color:#fff; background: rgba(255,255,255,.06); text-shadow: 0 0 6px rgba(255,255,255,.35); }
+
+    .grid {
+      display: grid; gap: 14px;
+      grid-template-columns: 1.05fr 1.2fr 1fr; /* izquierda | centro | derecha */
+      grid-template-areas:
+        "left center right";
+      height: 100%;
+    }
+  .card { background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; overflow: hidden; position:relative; z-index:1; }
+    h2 { margin: 0 0 10px; font-size: clamp(14px, 1.6vw, 18px); font-weight: 700; color: #f3f4f6; }
+    p, li { color: var(--text); font-size: clamp(12px, 1.2vw, 14px); line-height: 1.35; }
+    ul { margin: 8px 0 0 18px; padding: 0; }
+    .muted { color: var(--muted); }
+
+    /* LEFT: dataset + estrategias */
+    .left { grid-area: left; display: grid; gap: 14px; grid-template-rows: 1fr 1fr; }
+    .kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; }
+    .kv b { color: #e2e8f0; }
+
+    /* CENTER: infografía */
+    .center { grid-area: center; display: grid; grid-template-rows: 1fr 1fr; gap: 14px; }
+    .infographics { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: center; }
+    .circle { display: grid; place-items: center; }
+    .circle svg { width: min(180px, 32vw); height: auto; }
+    .circle .label { margin-top: 6px; text-align: center; font-size: clamp(12px, 1.2vw, 14px); color: var(--muted); }
+    .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .kpi { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 10px; text-align: center; }
+    .kpi .val { font-size: clamp(18px, 2.2vw, 28px); font-weight: 800; }
+    .kpi .tag { font-size: 12px; color: var(--muted); }
+
+    /* RIGHT: clasificación */
+    .right { grid-area: right; display: grid; grid-template-rows: auto 1fr; gap: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: clamp(12px, 1.1vw, 13px); }
+    th, td { padding: 6px 8px; border-bottom: 1px dashed rgba(255,255,255,.12); text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { color: #cbd5e1; font-weight: 700; }
+
+  footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 18px 20px; }
+  .rec { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(90deg, rgba(255,255,255,.12), rgba(255,255,255,.06)); border: 1px solid rgba(255,255,255,.22); color: #fff; padding: 8px 12px; border-radius: 999px; font-weight: 700; text-shadow: 0 0 6px rgba(255,255,255,.35); }
+  .note { color: var(--muted); font-size: 12px; }
+  .rights { color: var(--muted); font-size: 12px; }
+  .avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,.3); box-shadow: 0 0 12px rgba(255,255,255,.12); }
+  .avatar-fallback { width: 56px; height: 56px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.06); color: #fff; font-weight: 800; letter-spacing: .5px; text-shadow: 0 0 6px rgba(255,255,255,.35); }
+  .author { display: inline-flex; align-items: center; gap: 10px; }
+  .author-info { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
+  .author-name { font-weight: 700; color: #e5e7eb; }
+  .author-role { font-size: 12px; color: var(--muted); }
+
+    /* Donut progress styles */
+    .donut { transform: rotate(-90deg); }
+    .donut-bg { stroke: rgba(255,255,255,.12); }
+    .donut-meter { transition: stroke-dasharray .8s ease; }
+
+    /* Responsive: en móvil permitimos scroll y apilamos */
+    @media (max-width: 860px) {
+      body { overflow: auto; }
+      .slide { height: auto; min-height: 100vh; }
+      .grid { grid-template-columns: 1fr; grid-template-areas: "center" "left" "right"; }
+      .left { grid-template-rows: auto; }
+      .center { grid-template-rows: auto; }
+      .infographics { grid-template-columns: 1fr 1fr; }
+      .kpis { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <section class="slide">
+    <!-- Figuras decorativas de fondo -->
+    <div class="decor">
+      <div class="blob one"></div>
+      <div class="blob two"></div>
+      <div class="blob three"></div>
+    </div>
+    <header>
+      <div class="title">
+        <img class="logo" id="ea-logo" src="https://i.imgur.com/Q57HCQU.png" alt="EA Tech Company logo blanco" referrerpolicy="no-referrer" onerror="this.remove();document.getElementById('ea-fallback').style.display='flex';" />
+        <div id="ea-fallback" class="logo-fallback" style="display:none; align-items:center;">EA Tech Company</div>
+        <h1>Credit Card Fraud Detection — Resumen Ejecutivo</h1>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+        <span class="badge"><img class="mini" src="https://i.imgur.com/2qwDHbq.png" alt="Data Science" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mini-badge',innerText:'DS'}));"/> Dataset: 284k tx · 0.17% fraude</span>
+        <span class="badge">Modelo: XGBoost <img class="mini" src="https://images.ctfassets.net/em6l9zw4tzag/oVfiswjNH7DuCb7qGEBPK/b391db3a1d0d3290b96ce7f6aacb32b0/python.png" alt="Python" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mini-badge',innerText:'Py'}));"/></span>
+        <span class="badge">Features: PCA V1–V28, Time, Amount</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Dataset + Estrategias -->
+      <section class="left">
+        <div class="card">
+          <h2>Presentación del dataset</h2>
+          <div class="kv">
+            <b>Fuente</b><span>Kaggle (mlg-ulb/creditcardfraud)</span>
+            <b>Volumen</b><span>≈ 284,807 transacciones (2 días, Europa)</span>
+            <b>Fraude</b><span>≈ 0.17% (clase minoritaria)</span>
+            <b>Variables</b><span>V1–V28 (PCA), Time, Amount (+ AmountLog)</span>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Estrategias utilizadas</h2>
+          <ul>
+            <li>Outliers: filtro IQR por clase con tolerancia por fila.</li>
+            <li>Preprocesamiento: escalado robusto solo para no‑PCA; PCA passthrough.</li>
+            <li>Desbalance: pipelines con over/under‑sampling dentro de CV.</li>
+            <li>Validación: Stratified K‑Fold + RandomizedSearchCV (AP como métrica).</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- CENTER: Infografías -->
+      <section class="center">
+        <div class="card infographics">
+          <!-- Donut 1: Detección -->
+          <div class="circle">
+            <svg viewBox="0 0 120 120" role="img" aria-label="Detección de fraudes 98%">
+              <circle class="donut donut-bg" cx="60" cy="60" r="48" stroke-width="12" fill="none" />
+              <!-- circunferencia = 2πr ≈ 301.59; 98% -> 0.98 * 301.59 -->
+              <circle class="donut donut-meter" cx="60" cy="60" r="48" stroke="url(#grad1)" stroke-width="12" stroke-linecap="round" fill="none" stroke-dasharray="295 301.59"/>
+              <defs>
+                <linearGradient id="grad1" x1="0" x2="1">
+                  <stop offset="0%" stop-color="var(--accent)"/>
+                  <stop offset="100%" stop-color="var(--ok)"/>
+                </linearGradient>
+              </defs>
+              <g transform="translate(60,63)" style="transform: translate(60px,63px);">
+                <text x="0" y="0" text-anchor="middle" fill="#e5e7eb" font-size="22" font-weight="800">98%</text>
+                <text x="0" y="16" text-anchor="middle" fill="#94a3b8" font-size="10">Detección</text>
+              </g>
+            </svg>
+            <div class="label">Recall de fraude</div>
+          </div>
+          <!-- Donut 2: Falsas alarmas -->
+          <div class="circle">
+            <svg viewBox="0 0 120 120" role="img" aria-label="Falsas alarmas 0.00%">
+              <circle class="donut donut-bg" cx="60" cy="60" r="48" stroke-width="12" fill="none" />
+              <circle class="donut donut-meter" cx="60" cy="60" r="48" stroke="url(#grad2)" stroke-width="12" stroke-linecap="round" fill="none" stroke-dasharray="0.1 301.59"/>
+              <defs>
+                <linearGradient id="grad2" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#64748b"/>
+                  <stop offset="100%" stop-color="#334155"/>
+                </linearGradient>
+              </defs>
+              <g transform="translate(60,63)">
+                <text x="0" y="0" text-anchor="middle" fill="#e5e7eb" font-size="22" font-weight="800">0.00%</text>
+                <text x="0" y="16" text-anchor="middle" fill="#94a3b8" font-size="10">Falsas alarmas</text>
+              </g>
+            </svg>
+            <div class="label">Precisión operativa</div>
+          </div>
+        </div>
+        <div class="card kpis">
+          <div class="kpi">
+            <div class="tag">Ahorro neto anual</div>
+            <div class="val" style="color: var(--ok)">$5,688</div>
+          </div>
+          <div class="kpi">
+            <div class="tag">ROI del modelo</div>
+            <div class="val" style="color: var(--accent)">532%</div>
+          </div>
+          <div class="kpi">
+            <div class="tag">Ahorro por cada $1</div>
+            <div class="val" style="color: var(--accent-2)">$6.3</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Resultados de clasificación -->
+      <section class="right">
+        <div class="card">
+          <h2>Resultados de clasificación (test)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Clase</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1-score</th>
+                <th>Soporte</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0</td>
+                <td>1.00</td>
+                <td>1.00</td>
+                <td>1.00</td>
+                <td>30,922</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>1.00</td>
+                <td>0.98</td>
+                <td>0.99</td>
+                <td>61</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h2>Modelo</h2>
+          <ul>
+            <li><b>Algoritmo:</b> XGBoost (binary:logistic)</li>
+            <li><b>Optimización:</b> RandomizedSearchCV sobre AP</li>
+            <li><b>Umbral de decisión:</b> configurable (ej. 0.10)</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <div class="rec">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 13l4 4L19 7" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Recomendación: Implementar el modelo (beneficio claro)
+      </div>
+      <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end; text-align:right">
+            <div class="author">
+              <img class="avatar" id="author-photo" src="https://media.licdn.com/dms/image/v2/D4E03AQHBjglRbVTxCg/profile-displayphoto-shrink_800_800/B4EZVzsOY3HcAg-/0/1741402728439?e=1757548800&v=beta&t=mvLkTMgWJl4rCH2Odixiq8-UEojOyj7b2OKH0zL404o" alt="Foto del autor" referrerpolicy="no-referrer" onerror="this.remove();document.getElementById('author-fallback').style.display='inline-flex';" />
+              <span id="author-fallback" class="avatar-fallback" style="display:none;">EA</span>
+              <span class="author-info">
+                <span class="author-name">Daniel Hurtado</span>
+                <span class="author-role">Data Scientist</span>
+              </span>
+            </div>
+            <div class="rights">© 2025 EA Tech Company. Todos los derechos reservados.</div>
+        </div>
+    </footer>
+  </section>
+
+  <script>
+    // Pequeña mejora: si el viewport es muy bajo, reducir tamaños para evitar overflow
+    const adjustScale = () => {
+      const h = window.innerHeight; const root = document.documentElement;
+      if (h < 700) { root.style.setProperty('--radius', '12px'); }
+    };
+    window.addEventListener('resize', adjustScale);
+    adjustScale();
+  </script>
+</body>
+</html>
