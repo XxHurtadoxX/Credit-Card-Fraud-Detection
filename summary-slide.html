@@ -56,6 +56,11 @@
   .mini { height: 16px; width: auto; display:block; filter: contrast(1.1) brightness(1.1); }
   .mini-badge { display:inline-flex; align-items:center; justify-content:center; width: 18px; height: 18px; border:1px solid rgba(255,255,255,.25); border-radius: 4px; font-size: 10px; font-weight: 800; color:#fff; background: rgba(255,255,255,.06); text-shadow: 0 0 6px rgba(255,255,255,.35); }
 
+  /* Imágenes compactas para no romper el alto de la slide */
+  .img-ambient { width: 100%; height: 144px; object-fit: cover; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); box-shadow: 0 6px 20px rgba(0,0,0,.35); margin: 6px 0 10px; display:block; }
+  .img-infographic { width: 100%; max-height: 270px; object-fit: contain; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); box-shadow: 0 6px 20px rgba(0,0,0,.35); margin: 6px 0 8px; display:block; background: rgba(255,255,255,.02); }
+  .img-fallback { width: 100%; height: 144px; display: grid; place-items: center; color: #cbd5e1; border: 1px dashed rgba(255,255,255,.18); border-radius: 10px; background: rgba(255,255,255,.03); margin: 6px 0 10px; font-weight: 700; letter-spacing: .3px; }
+
     .grid {
       display: grid; gap: 14px;
       grid-template-columns: 1.05fr 1.2fr 1fr; /* izquierda | centro | derecha */
@@ -146,6 +151,8 @@
       <section class="left">
         <div class="card">
           <h2>Presentación del dataset</h2>
+          <img class="img-ambient" id="ambient-img" src="https://uflow.biz/wp-content/uploads/2022/10/UFLOW-servicios-para-deteccion-de-fraude.jpg" alt="Ambientación detección de fraude" referrerpolicy="no-referrer" onerror="this.remove();document.getElementById('ambient-fallback').style.display='grid';" />
+          <div id="ambient-fallback" class="img-fallback" style="display:none;">Detección de fraude</div>
           <div class="kv">
             <b>Fuente</b><span>Kaggle (mlg-ulb/creditcardfraud)</span>
             <b>Volumen</b><span>≈ 284,807 transacciones (2 días, Europa)</span>
@@ -255,6 +262,8 @@
         </div>
         <div class="card">
           <h2>Modelo</h2>
+          <img class="img-infographic" id="xgb-img" src="https://lh3.googleusercontent.com/4svO7UdzXj-JxFwU-_SyrMWMqxp8Al3pVpQYr5A-nzCDXdEqVL_CHeqbeVVW8Kivsq76q5sozAKwGsQuy5qnk5wVYfqWb5LHxhknBm9DSLBjg0ViSRTVjZ3gFQPwiGxJ8wP2usOH" alt="Infografía XGBoost" referrerpolicy="no-referrer" onerror="this.remove();document.getElementById('xgb-fallback').style.display='grid';" />
+          <div id="xgb-fallback" class="img-fallback" style="display:none; height: 370px;">XGBoost</div>
           <ul>
             <li><b>Algoritmo:</b> XGBoost (binary:logistic)</li>
             <li><b>Optimización:</b> RandomizedSearchCV sobre AP</li>
