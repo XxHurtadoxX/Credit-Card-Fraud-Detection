@@ -1,0 +1,827 @@
+{
+  "generated_on": "2026-08-12",
+  "environment": {
+    "python": "3.13.3",
+    "numpy": "2.4.2",
+    "pandas": "2.2.3"
+  },
+  "dataset": {
+    "rows": 284807,
+    "frauds": 492,
+    "prevalence": 0.001727,
+    "window_days": 2.0
+  },
+  "split": {
+    "strategy": "temporal",
+    "test_fraction": 0.2,
+    "train_rows": 227845,
+    "train_frauds": 417,
+    "validation_rows": 56962,
+    "validation_frauds": 57,
+    "test_rows": 56962,
+    "test_frauds": 75,
+    "test_window_days": 0.32
+  },
+  "model_selection": {
+    "criterion": "savings_share, umbral elegido dentro de cada fold",
+    "candidates": {
+      "logreg_balanced": {
+        "savings_share_mean": 0.382,
+        "savings_share_std": 0.0616,
+        "savings_share_folds": [
+          0.4684,
+          0.3501,
+          0.3036,
+          0.4058
+        ],
+        "value_recall_mean": 0.6914,
+        "alerts_per_day_mean": 456.5,
+        "ap_mean": 0.6771,
+        "ap_std": 0.1235
+      },
+      "xgb_plain": {
+        "savings_share_mean": 0.5494,
+        "savings_share_std": 0.0975,
+        "savings_share_folds": [
+          0.5385,
+          0.6619,
+          0.3984,
+          0.5988
+        ],
+        "value_recall_mean": 0.6893,
+        "alerts_per_day_mean": 179.9,
+        "ap_mean": 0.7812,
+        "ap_std": 0.0362
+      },
+      "xgb_weighted": {
+        "savings_share_mean": 0.5706,
+        "savings_share_std": 0.0776,
+        "savings_share_folds": [
+          0.5978,
+          0.6434,
+          0.4398,
+          0.6012
+        ],
+        "value_recall_mean": 0.7241,
+        "alerts_per_day_mean": 216.3,
+        "ap_mean": 0.7866,
+        "ap_std": 0.0479
+      },
+      "xgb_cost": {
+        "savings_share_mean": 0.4532,
+        "savings_share_std": 0.0956,
+        "savings_share_folds": [
+          0.3815,
+          0.6067,
+          0.3647,
+          0.46
+        ],
+        "value_recall_mean": 0.5833,
+        "alerts_per_day_mean": 194.7,
+        "ap_mean": 0.701,
+        "ap_std": 0.0572
+      },
+      "xgb_cost_balanced": {
+        "savings_share_mean": 0.5563,
+        "savings_share_std": 0.0736,
+        "savings_share_folds": [
+          0.5795,
+          0.6434,
+          0.4401,
+          0.5622
+        ],
+        "value_recall_mean": 0.7061,
+        "alerts_per_day_mean": 213.8,
+        "ap_mean": 0.7847,
+        "ap_std": 0.044
+      }
+    },
+    "selected": "xgb_weighted",
+    "hyperparameters": {
+      "best_value": 0.5885,
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 6,
+        "learning_rate": 0.09005148081248647,
+        "subsample": 0.956638117297544,
+        "colsample_bytree": 0.7495202973249555,
+        "min_child_weight": 4,
+        "reg_lambda": 0.1054974405052213
+      },
+      "n_trials": 40,
+      "param_importances": {
+        "learning_rate": 0.7472,
+        "n_estimators": 0.2124,
+        "colsample_bytree": 0.0202,
+        "max_depth": 0.0072,
+        "subsample": 0.0061,
+        "min_child_weight": 0.0049,
+        "reg_lambda": 0.002
+      }
+    }
+  },
+  "threshold": {
+    "value": 0.96,
+    "chosen_on": "validation",
+    "validation": {
+      "threshold": 0.96,
+      "true_positives": 43,
+      "false_positives": 3,
+      "false_negatives": 14,
+      "true_negatives": 56902,
+      "alerts": 46,
+      "alerts_per_day": 159.9,
+      "recall": 0.7544,
+      "precision": 0.9348,
+      "value_recall": 0.6341,
+      "fraud_amount_total": 12231.09,
+      "fraud_amount_recovered": 6592.8,
+      "cost_missed_fraud": 4684.86,
+      "cost_unrecovered_fraud": 1163.43,
+      "cost_review": 184.0,
+      "cost_friction": 75.0,
+      "total_cost": 6107.29,
+      "baseline_cost": 13086.09,
+      "savings": 6978.8,
+      "savings_share": 0.5333
+    }
+  },
+  "test": {
+    "average_precision": 0.8099,
+    "roc_auc": 0.9848,
+    "prevalence": 0.001317,
+    "ap_lift_over_baseline": 615.1,
+    "recall_at_precision_25": {
+      "recall": 0.8267,
+      "threshold": 0.0046
+    },
+    "recall_at_precision_50": {
+      "recall": 0.8133,
+      "threshold": 0.0201
+    },
+    "recall_at_precision_75": {
+      "recall": 0.7733,
+      "threshold": 0.1008
+    },
+    "recall_at_precision_90": {
+      "recall": 0.7467,
+      "threshold": 0.7788
+    },
+    "cost": {
+      "threshold": 0.96,
+      "true_positives": 55,
+      "false_positives": 3,
+      "false_negatives": 20,
+      "true_negatives": 56884,
+      "alerts": 58,
+      "alerts_per_day": 181.9,
+      "recall": 0.7333,
+      "precision": 0.9483,
+      "value_recall": 0.6534,
+      "fraud_amount_total": 7729.26,
+      "fraud_amount_recovered": 4292.58,
+      "cost_missed_fraud": 2979.17,
+      "cost_unrecovered_fraud": 757.51,
+      "cost_review": 232.0,
+      "cost_friction": 75.0,
+      "total_cost": 4043.68,
+      "baseline_cost": 8854.26,
+      "savings": 4810.58,
+      "savings_share": 0.5433
+    },
+    "unreachable_fraud": {
+      "score_floor": 0.01,
+      "frauds": 75,
+      "frauds_below_floor": 13,
+      "share_of_frauds": 0.1733,
+      "amount_below_floor": 1751.18,
+      "share_of_fraud_amount": 0.2266
+    },
+    "operating_envelope": {
+      "reference_rule": "mejor umbral fijo",
+      "unconstrained": {
+        "threshold": 0.9758,
+        "precision": 0.9483,
+        "recall": 0.7333,
+        "value_recall": 0.6534,
+        "alerts_per_day": 181.9,
+        "savings": 4810.58,
+        "savings_share": 0.5433,
+        "share_of_unconstrained": 1.0
+      },
+      "max_value_recall_while_profitable": 0.7734,
+      "by_daily_capacity": {
+        "25": {
+          "alerts": 8,
+          "alerts_per_day": 25.1,
+          "precision": 1.0,
+          "recall": 0.1067,
+          "value_recall": 0.0647,
+          "savings": 513.38,
+          "savings_share": 0.058,
+          "share_of_unconstrained": 0.1067
+        },
+        "50": {
+          "alerts": 16,
+          "alerts_per_day": 50.2,
+          "precision": 1.0,
+          "recall": 0.2133,
+          "value_recall": 0.1708,
+          "savings": 1297.88,
+          "savings_share": 0.1466,
+          "share_of_unconstrained": 0.2698
+        },
+        "100": {
+          "alerts": 32,
+          "alerts_per_day": 100.4,
+          "precision": 1.0,
+          "recall": 0.4267,
+          "value_recall": 0.4246,
+          "savings": 3141.29,
+          "savings_share": 0.3548,
+          "share_of_unconstrained": 0.653
+        },
+        "150": {
+          "alerts": 48,
+          "alerts_per_day": 150.6,
+          "precision": 0.9792,
+          "recall": 0.6267,
+          "value_recall": 0.4863,
+          "savings": 3682.97,
+          "savings_share": 0.416,
+          "share_of_unconstrained": 0.7656
+        },
+        "200": {
+          "alerts": 64,
+          "alerts_per_day": 200.8,
+          "precision": 0.8906,
+          "recall": 0.76,
+          "value_recall": 0.6587,
+          "savings": 4751.34,
+          "savings_share": 0.5366,
+          "share_of_unconstrained": 0.9877
+        },
+        "400": {
+          "alerts": 128,
+          "alerts_per_day": 401.5,
+          "precision": 0.4766,
+          "recall": 0.8133,
+          "value_recall": 0.7718,
+          "savings": 3798.9,
+          "savings_share": 0.429,
+          "share_of_unconstrained": 0.7897
+        },
+        "800": {
+          "alerts": 255,
+          "alerts_per_day": 799.9,
+          "precision": 0.2431,
+          "recall": 0.8267,
+          "value_recall": 0.7734,
+          "savings": 166.37,
+          "savings_share": 0.0188,
+          "share_of_unconstrained": 0.0346
+        }
+      },
+      "by_min_precision": {
+        "0.5": {
+          "threshold": 0.9758,
+          "precision": 0.9483,
+          "recall": 0.7333,
+          "value_recall": 0.6534,
+          "alerts_per_day": 181.9,
+          "savings": 4810.58,
+          "savings_share": 0.5433,
+          "share_of_unconstrained": 1.0
+        },
+        "0.75": {
+          "threshold": 0.9758,
+          "precision": 0.9483,
+          "recall": 0.7333,
+          "value_recall": 0.6534,
+          "alerts_per_day": 181.9,
+          "savings": 4810.58,
+          "savings_share": 0.5433,
+          "share_of_unconstrained": 1.0
+        },
+        "0.9": {
+          "threshold": 0.9758,
+          "precision": 0.9483,
+          "recall": 0.7333,
+          "value_recall": 0.6534,
+          "alerts_per_day": 181.9,
+          "savings": 4810.58,
+          "savings_share": 0.5433,
+          "share_of_unconstrained": 1.0
+        },
+        "0.95": {
+          "threshold": 0.9998,
+          "precision": 1.0,
+          "recall": 0.5867,
+          "value_recall": 0.485,
+          "alerts_per_day": 138.0,
+          "savings": 3670.11,
+          "savings_share": 0.4145,
+          "share_of_unconstrained": 0.7629
+        },
+        "0.99": {
+          "threshold": 0.9998,
+          "precision": 1.0,
+          "recall": 0.5867,
+          "value_recall": 0.485,
+          "alerts_per_day": 138.0,
+          "savings": 3670.11,
+          "savings_share": 0.4145,
+          "share_of_unconstrained": 0.7629
+        }
+      }
+    }
+  },
+  "baselines": {
+    "note": "Las reglas se calibran sobre el mismo tramo de validacion que el umbral del modelo y se aplican al mismo conjunto de prueba. El arbol es la vara relevante.",
+    "rules": {
+      "monto": {
+        "descripcion": "revisar si Amount >= 2499.91",
+        "parametros": {
+          "cut": 2499.91
+        },
+        "test": {
+          "threshold": 0.5,
+          "true_positives": 0,
+          "false_positives": 68,
+          "false_negatives": 75,
+          "true_negatives": 56819,
+          "alerts": 68,
+          "alerts_per_day": 213.3,
+          "recall": 0.0,
+          "precision": 0.0,
+          "value_recall": 0.0,
+          "fraud_amount_total": 7729.26,
+          "fraud_amount_recovered": 0.0,
+          "cost_missed_fraud": 8854.26,
+          "cost_unrecovered_fraud": 0.0,
+          "cost_review": 272.0,
+          "cost_friction": 1700.0,
+          "total_cost": 10826.26,
+          "baseline_cost": 8854.26,
+          "savings": -1972.0,
+          "savings_share": -0.2227
+        }
+      },
+      "monto_hora": {
+        "descripcion": "revisar si Amount >= 1814.92, o si Amount >= 71.30 entre las 0 y las 6",
+        "parametros": {
+          "cut": 1814.92,
+          "night_cut": 71.3
+        },
+        "test": {
+          "threshold": 0.5,
+          "true_positives": 0,
+          "false_positives": 141,
+          "false_negatives": 75,
+          "true_negatives": 56746,
+          "alerts": 141,
+          "alerts_per_day": 442.3,
+          "recall": 0.0,
+          "precision": 0.0,
+          "value_recall": 0.0,
+          "fraud_amount_total": 7729.26,
+          "fraud_amount_recovered": 0.0,
+          "cost_missed_fraud": 8854.26,
+          "cost_unrecovered_fraud": 0.0,
+          "cost_review": 564.0,
+          "cost_friction": 3525.0,
+          "total_cost": 12943.26,
+          "baseline_cost": 8854.26,
+          "savings": -4089.0,
+          "savings_share": -0.4618
+        }
+      },
+      "arbol": {
+        "descripcion": "motor de reglas de profundidad 3, 8 hojas, umbral 0.98",
+        "parametros": {
+          "max_depth": 3,
+          "leaves": 8,
+          "threshold": 0.98
+        },
+        "test": {
+          "threshold": 0.98,
+          "true_positives": 53,
+          "false_positives": 71,
+          "false_negatives": 22,
+          "true_negatives": 56816,
+          "alerts": 124,
+          "alerts_per_day": 389.0,
+          "recall": 0.7067,
+          "precision": 0.4274,
+          "value_recall": 0.497,
+          "fraud_amount_total": 7729.26,
+          "fraud_amount_recovered": 3265.02,
+          "cost_missed_fraud": 4218.06,
+          "cost_unrecovered_fraud": 576.18,
+          "cost_review": 496.0,
+          "cost_friction": 1775.0,
+          "total_cost": 7065.24,
+          "baseline_cost": 8854.26,
+          "savings": 1789.02,
+          "savings_share": 0.2021
+        }
+      }
+    },
+    "best_rule": "arbol",
+    "rule_engine": "|--- V14 <= -1.63\n|   |--- V10 <= -1.88\n|   |   |--- V11 <= 0.13\n|   |   |   |--- class: 0\n|   |   |--- V11 >  0.13\n|   |   |   |--- class: 1\n|   |--- V10 >  -1.88\n|   |   |--- V4 <= 2.27\n|   |   |   |--- class: 0\n|   |   |--- V4 >  2.27\n|   |   |   |--- class: 1\n|--- V14 >  -1.63\n|   |--- V4 <= 1.66\n|   |   |--- V14 <= -0.43\n|   |   |   |--- class: 0\n|   |   |--- V14 >  -0.43\n|   |   |   |--- class: 0\n|   |--- V4 >  1.66\n|   |   |--- V8 <= -0.11\n|   |   |   |--- class: 1\n|   |   |--- V8 >  -0.11\n|   |   |   |--- class: 0\n",
+    "model_uplift_over_best_rule": {
+      "model_savings": 4810.58,
+      "rule_savings": 1789.02,
+      "absolute": 3021.56,
+      "relative": 1.6889
+    }
+  },
+  "backtest": {
+    "blocks": [
+      {
+        "block": 1,
+        "history_rows": 128163,
+        "block_rows": 26107,
+        "block_frauds": 74,
+        "block_days": 0.258,
+        "threshold": 0.98,
+        "recall": 0.8108,
+        "precision": 0.8955,
+        "alerts_per_day": 259.2,
+        "savings": 4874.49,
+        "savings_share": 0.5458,
+        "rule": "monto",
+        "rule_savings_share": -0.1591,
+        "uplift_points": 70.5
+      },
+      {
+        "block": 2,
+        "history_rows": 154270,
+        "block_rows": 26107,
+        "block_frauds": 30,
+        "block_days": 0.273,
+        "threshold": 0.26,
+        "recall": 0.8,
+        "precision": 0.48,
+        "alerts_per_day": 183.4,
+        "savings": 800.38,
+        "savings_share": 0.1692,
+        "rule": "arbol",
+        "rule_savings_share": -2.3256,
+        "uplift_points": 249.5
+      },
+      {
+        "block": 3,
+        "history_rows": 180377,
+        "block_rows": 26108,
+        "block_frauds": 29,
+        "block_days": 0.136,
+        "threshold": 0.98,
+        "recall": 0.7586,
+        "precision": 0.88,
+        "alerts_per_day": 184.4,
+        "savings": 3279.83,
+        "savings_share": 0.51,
+        "rule": "monto",
+        "rule_savings_share": -0.2931,
+        "uplift_points": 80.3
+      },
+      {
+        "block": 4,
+        "history_rows": 206485,
+        "block_rows": 26107,
+        "block_frauds": 29,
+        "block_days": 0.127,
+        "threshold": 0.94,
+        "recall": 0.7241,
+        "precision": 0.875,
+        "alerts_per_day": 188.5,
+        "savings": 3523.26,
+        "savings_share": 0.7917,
+        "rule": "monto",
+        "rule_savings_share": -0.378,
+        "uplift_points": 117.0
+      },
+      {
+        "block": 5,
+        "history_rows": 232592,
+        "block_rows": 26107,
+        "block_frauds": 49,
+        "block_days": 0.134,
+        "threshold": 0.98,
+        "recall": 0.7755,
+        "precision": 1.0,
+        "alerts_per_day": 284.4,
+        "savings": 2555.9,
+        "savings_share": 0.4146,
+        "rule": "arbol",
+        "rule_savings_share": 0.245,
+        "uplift_points": 17.0
+      },
+      {
+        "block": 6,
+        "history_rows": 258699,
+        "block_rows": 26108,
+        "block_frauds": 21,
+        "block_days": 0.162,
+        "threshold": 0.72,
+        "recall": 0.7143,
+        "precision": 0.7895,
+        "alerts_per_day": 117.1,
+        "savings": 1309.35,
+        "savings_share": 0.5221,
+        "rule": "arbol",
+        "rule_savings_share": 0.2501,
+        "uplift_points": 27.2
+      }
+    ],
+    "n_blocks_evaluated": 6,
+    "savings_share_mean": 0.4922,
+    "savings_share_std": 0.1845,
+    "savings_share_min": 0.1692,
+    "savings_share_max": 0.7917,
+    "uplift_points_mean": 93.6,
+    "uplift_points_min": 17.0,
+    "blocks_where_model_wins": 6
+  },
+  "reference_logreg": {
+    "average_precision": 0.7596,
+    "roc_auc": 0.9856,
+    "prevalence": 0.001317,
+    "ap_lift_over_baseline": 576.9
+  },
+  "cost_assumptions": {
+    "review": 4.0,
+    "friction": 25.0,
+    "recovery_rate": 0.85,
+    "chargeback_fee": 15.0,
+    "daily_review_capacity": 400
+  },
+  "sensitivity": {
+    "friction": [
+      {
+        "friction": 0,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 7053.8,
+        "savings_share": 0.539
+      },
+      {
+        "friction": 10,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 7023.8,
+        "savings_share": 0.5367
+      },
+      {
+        "friction": 25,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 6978.8,
+        "savings_share": 0.5333
+      },
+      {
+        "friction": 50,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 6903.8,
+        "savings_share": 0.5276
+      },
+      {
+        "friction": 100,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 6753.8,
+        "savings_share": 0.5161
+      }
+    ],
+    "review": [
+      {
+        "review": 0,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 7162.8,
+        "savings_share": 0.5474
+      },
+      {
+        "review": 0.5,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 7139.8,
+        "savings_share": 0.5456
+      },
+      {
+        "review": 1,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 7116.8,
+        "savings_share": 0.5438
+      },
+      {
+        "review": 2,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 7070.8,
+        "savings_share": 0.5403
+      },
+      {
+        "review": 4,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 6978.8,
+        "savings_share": 0.5333
+      },
+      {
+        "review": 8,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "precision": 0.9348,
+        "alerts_per_day": 159.9,
+        "savings": 6794.8,
+        "savings_share": 0.5192
+      }
+    ],
+    "grid_review_friction": [
+      {
+        "review": 0,
+        "friction": 0,
+        "threshold": 0.04,
+        "recall": 0.7895,
+        "alerts_per_day": 344.2,
+        "savings": 7269.1
+      },
+      {
+        "review": 0,
+        "friction": 2,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7231.8
+      },
+      {
+        "review": 0,
+        "friction": 5,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7222.8
+      },
+      {
+        "review": 0,
+        "friction": 10,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7207.8
+      },
+      {
+        "review": 0,
+        "friction": 25,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7162.8
+      },
+      {
+        "review": 1,
+        "friction": 0,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7191.8
+      },
+      {
+        "review": 1,
+        "friction": 2,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7185.8
+      },
+      {
+        "review": 1,
+        "friction": 5,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7176.8
+      },
+      {
+        "review": 1,
+        "friction": 10,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7161.8
+      },
+      {
+        "review": 1,
+        "friction": 25,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7116.8
+      },
+      {
+        "review": 2,
+        "friction": 0,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7145.8
+      },
+      {
+        "review": 2,
+        "friction": 2,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7139.8
+      },
+      {
+        "review": 2,
+        "friction": 5,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7130.8
+      },
+      {
+        "review": 2,
+        "friction": 10,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7115.8
+      },
+      {
+        "review": 2,
+        "friction": 25,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7070.8
+      },
+      {
+        "review": 4,
+        "friction": 0,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7053.8
+      },
+      {
+        "review": 4,
+        "friction": 2,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7047.8
+      },
+      {
+        "review": 4,
+        "friction": 5,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7038.8
+      },
+      {
+        "review": 4,
+        "friction": 10,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 7023.8
+      },
+      {
+        "review": 4,
+        "friction": 25,
+        "threshold": 0.96,
+        "recall": 0.7544,
+        "alerts_per_day": 159.9,
+        "savings": 6978.8
+      }
+    ]
+  }
+}

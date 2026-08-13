@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Deteccion de fraude con tarjeta de credito, resumen ejecutivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tinta:   #0A0E14;
+    --grafito: #131A24;
+    --acero:   #2A3441;
+    --humo:    #F6F7F9;
+    --papel:   #FFFFFF;
+    --linea:   #E3E7EC;
+    --medio:   #5B6673;
+
+    --cobre-claro:  #C87941;
+    --cobre:        #8A4B1E;
+    --patina-clara: #35E0B8;
+    --patina:       #0E7C68;
+
+    --ok:      #16A34A;
+    --alerta:  #D97706;
+    --riesgo:  #DC2626;
+
+    --titulo: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+    --cuerpo: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono:   "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--humo);
+    color: var(--tinta);
+    font-family: var(--cuerpo);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .hoja { max-width: 1180px; margin: 0 auto; background: var(--humo); }
+
+  /* ---------- Cabecera ---------- */
+  header {
+    background: var(--tinta);
+    color: var(--papel);
+    padding: 30px 38px 46px;
+    position: relative;
+  }
+  .cabecera { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+  .medallon {
+    width: 116px; height: 116px; flex: 0 0 auto; display: block;
+    /* Desbordamiento controlado del borde inferior de la franja oscura,
+       hasta un cuarto de la altura del medallon. */
+    margin-bottom: -46px;
+  }
+  .rotulo { flex: 1 1 340px; min-width: 260px; }
+  .rotulo .linea-1 {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--patina-clara); margin-bottom: 6px;
+  }
+  .rotulo h1 {
+    font-family: var(--titulo); font-weight: 700; font-size: 30px;
+    line-height: 1.15; margin: 0 0 6px;
+  }
+  .rotulo .linea-3 { color: #A8B2BF; font-size: 14px; margin: 0; }
+
+  .herramientas { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .herramientas span {
+    font-family: var(--mono); font-size: 11px; color: #C9D1DB;
+    border: 1px solid var(--acero); padding: 5px 9px; border-radius: 3px;
+  }
+
+  /* Canto estriado, el borde acanalado de la moneda */
+  .estriado {
+    height: 9px; margin: 0;
+    background-image: repeating-linear-gradient(90deg,
+      var(--acero) 0 1px, transparent 1px 6px);
+  }
+  .estriado.claro {
+    background-image: repeating-linear-gradient(90deg,
+      var(--linea) 0 1px, transparent 1px 6px);
+  }
+
+  /* ---------- Cuerpo ---------- */
+  main { padding: 40px 38px 8px; }
+  section { margin-bottom: 34px; }
+  h2 {
+    font-family: var(--titulo); font-weight: 600; font-size: 19px;
+    margin: 0 0 4px;
+  }
+  .sub { color: var(--medio); font-size: 13.5px; margin: 0 0 18px; }
+  p { margin: 0 0 12px; }
+  .tag {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--patina); margin-bottom: 8px;
+  }
+
+  .rejilla { display: grid; gap: 16px; }
+  .rejilla.k3 { grid-template-columns: repeat(3, 1fr); }
+  .rejilla.k4 { grid-template-columns: repeat(4, 1fr); }
+  .rejilla.k2 { grid-template-columns: 1.15fr 1fr; }
+
+  .panel {
+    background: var(--papel); border: 1px solid var(--linea);
+    border-top: 3px solid var(--patina); border-radius: 4px; padding: 16px 18px;
+  }
+  .panel.cobre { border-top-color: var(--cobre); }
+  .panel.gris  { border-top-color: var(--medio); }
+  .panel h3 {
+    font-family: var(--titulo); font-weight: 600; font-size: 15px; margin: 0 0 8px;
+  }
+  .panel p:last-child, .panel ul:last-child { margin-bottom: 0; }
+  ul { margin: 0 0 10px; padding-left: 18px; }
+  li { margin-bottom: 5px; }
+
+  /* Cifras */
+  .cifra {
+    font-family: var(--titulo); font-weight: 700; font-size: 30px;
+    line-height: 1.05; font-variant-numeric: tabular-nums;
+  }
+  .cifra.patina { color: var(--patina); }
+  .cifra.cobre  { color: var(--cobre); }
+  .cifra small { font-size: 15px; font-weight: 600; color: var(--medio); }
+  .pie { font-size: 12.5px; color: var(--medio); margin-top: 4px; }
+  .inst {
+    font-family: var(--mono); font-size: 10px; color: var(--medio);
+    letter-spacing: .08em; display: block; margin-top: 10px;
+  }
+
+  /* Tablas */
+  .tabla-envoltura { overflow-x: auto; }
+  table {
+    width: 100%; border-collapse: collapse; background: var(--papel);
+    font-size: 13.5px; font-variant-numeric: tabular-nums;
+  }
+  caption {
+    text-align: left; color: var(--medio); font-size: 12.5px;
+    padding: 0 0 7px;
+  }
+  th, td { padding: 8px 11px; border-bottom: 1px solid var(--linea); text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th {
+    font-family: var(--titulo); font-weight: 600; font-size: 12.5px;
+    color: var(--medio); border-bottom: 1px solid var(--acero);
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tr.destacada td { background: #F3FAF7; font-weight: 600; }
+  td.mono, th.mono { font-family: var(--mono); font-size: 12.5px; }
+  .marca-patina { color: var(--patina); font-weight: 600; }
+  .marca-cobre { color: var(--cobre); font-weight: 600; }
+  .marca-riesgo { color: var(--riesgo); font-weight: 600; }
+
+  /* Traza de circuito: el flujo del pipeline */
+  .flujo { background: var(--papel); border: 1px solid var(--linea); border-radius: 4px; padding: 6px 4px; }
+  .flujo svg { width: 100%; height: auto; display: block; }
+
+  figure { margin: 0; }
+  figure img {
+    width: 100%; max-width: 100%; display: block;
+    border: 1px solid var(--linea); border-radius: 4px; background: var(--papel);
+  }
+  figcaption { font-size: 12.5px; color: var(--medio); margin-top: 7px; }
+
+  .aviso {
+    background: var(--papel); border: 1px solid var(--linea);
+    border-left: 3px solid var(--alerta); border-radius: 4px;
+    padding: 14px 17px; font-size: 14px;
+  }
+  .aviso strong { font-weight: 600; }
+
+  /* ---------- Cierre ---------- */
+  .cierre {
+    background: var(--tinta); color: var(--papel);
+    padding: 44px 38px; margin-top: 34px; text-align: center;
+  }
+  .cierre .frase {
+    font-family: "Instrument Serif", Georgia, serif; font-style: italic;
+    font-size: clamp(21px, 3.1vw, 31px); line-height: 1.28;
+    max-width: 20em; margin: 0 auto; color: var(--papel);
+  }
+
+  /* ---------- Firma ---------- */
+  .firma {
+    background: var(--grafito); color: #C9D1DB;
+    padding: 20px 38px; display: flex; align-items: center;
+    justify-content: space-between; gap: 18px; flex-wrap: wrap;
+    font-size: 12.5px;
+  }
+  .autor { display: flex; align-items: center; gap: 12px; }
+  .autor img {
+    width: 46px; height: 46px; border-radius: 50%; object-fit: cover;
+    border: 1px solid var(--acero); display: block;
+  }
+  .autor .nombre {
+    font-family: var(--titulo); font-weight: 600; font-size: 15px;
+    color: var(--papel); display: block; line-height: 1.25;
+  }
+  .autor .rol { color: var(--medio); }
+  .derechos { font-family: var(--mono); font-size: 11px; color: var(--medio); text-align: right; }
+
+  @media (max-width: 880px) {
+    .rejilla.k3, .rejilla.k4, .rejilla.k2 { grid-template-columns: 1fr 1fr; }
+    header, main, .cierre, .firma { padding-left: 22px; padding-right: 22px; }
+  }
+  @media (max-width: 560px) {
+    .rejilla.k3, .rejilla.k4, .rejilla.k2 { grid-template-columns: 1fr; }
+    .rotulo h1 { font-size: 24px; }
+  }
+  @media print {
+    body { background: var(--papel); }
+    .panel, figure img, table { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="hoja">
+
+  <header>
+    <div class="cabecera">
+      <img class="medallon" src="../assets/logo-medallon.png" alt="Sello de autoria" />
+      <div class="rotulo">
+        <div class="linea-1">Resumen ejecutivo</div>
+        <h1>Deteccion de fraude con tarjeta de credito</h1>
+        <p class="linea-3">Cuando alertar, no cuanto acertar. Dataset publico de 284.807 operaciones europeas, dos dias de septiembre de 2013.</p>
+      </div>
+      <div class="herramientas">
+        <span>PYTHON 3.11</span>
+        <span>XGBOOST 3.0</span>
+        <span>SCIKIT-LEARN 1.7</span>
+      </div>
+    </div>
+  </header>
+  <div class="estriado"></div>
+
+  <main>
+
+    <section>
+      <div class="tag">CASE.INTRO</div>
+      <h2>El problema</h2>
+      <p>Las entidades financieras pierden dinero por fraude con tarjeta de credito, y la perdida no se puede evitar simplemente siendo mas estricto. Cada vez que llega una operacion hay que decidir en el momento si se aprueba o si se detiene para revisarla, y las dos decisiones cuestan. Detener una compra legitima molesta a un cliente que no hizo nada y consume tiempo de un analista. Dejar pasar un fraude significa perder el monto completo y pagar despues el contracargo.</p>
+      <p>El desafio es que el fraude es rarisimo. En el conjunto de datos de este proyecto hay 492 operaciones fraudulentas sobre 284.807, es decir una cada 579. Un sistema que apruebe todo acierta el 99,83&nbsp;% de las veces y sin embargo no sirve para nada.</p>
+
+      <h2 style="margin-top:26px">Como se resuelve hoy</h2>
+      <p>Antes de tener modelos estadisticos, y todavia hoy en muchas operaciones, la deteccion se apoya en un motor de reglas escritas por analistas de riesgo. Son condiciones explicitas del tipo detener la operacion si el monto pasa de cierto valor, si llega en un horario inusual o si combina varias caracteristicas sospechosas. El motor se calibra revisando el historico de contracargos y tiene la ventaja de que cualquiera puede leer por que se detuvo una compra.</p>
+      <p>Su limite es la cantidad de condiciones que una persona puede escribir y mantener. Un motor de reglas captura los patrones evidentes, pero no combina veinte variables a la vez ni ajusta sus umbrales segun cuanto dinero esta en juego en cada operacion.</p>
+
+      <h2 style="margin-top:26px">Que se construyo</h2>
+      <p>Un modelo que estima la probabilidad de fraude de cada operacion y decide alertar comparando lo que cuesta equivocarse en cada direccion. El punto de corte no se elige por criterios estadisticos sino economicos, buscando el menor costo total para la entidad y respetando la capacidad real de revision del equipo.</p>
+      <p>Todo lo que sigue compara ese modelo contra el motor de reglas descrito arriba, medido sobre las mismas 56.962 operaciones que ninguno de los dos vio durante su calibracion. La comparacion no es contra la ausencia de control, porque ninguna entidad opera sin control. Sobre esas operaciones el modelo evita 54&nbsp;% de la perdida evitable frente al 20&nbsp;% del motor de reglas, una diferencia de 34 puntos.</p>
+    </section>
+
+
+    <section>
+      <div class="tag">COST.ASSUMPTIONS</div>
+      <h2>Cuanto cuesta cada tipo de error</h2>
+      <p>Para poder comparar dos sistemas de deteccion hay que poder decir cuanto cuesta cada decision. Cada vez que el sistema evalua una operacion se da una de cuatro situaciones, y cada una tiene una consecuencia economica distinta.</p>
+      <div class="rejilla k2" style="margin-bottom:18px">
+        <div class="panel">
+          <h3>Se detecta un fraude real</h3>
+          <p>La operacion se detiene y se investiga. Se paga el costo de la revision y se recupera buena parte del dinero, aunque nunca todo, porque una fraccion ya se fue.</p>
+          <h3 style="margin-top:14px">Se aprueba una compra legitima</h3>
+          <p>El caso normal. No cuesta nada y es lo que ocurre en la enorme mayoria de las operaciones.</p>
+        </div>
+        <div class="panel cobre">
+          <h3>Pasa un fraude sin detectar</h3>
+          <p>Se pierde el monto completo de la operacion y ademas el cargo fijo que cobra la red por procesar el contracargo. Es el error mas caro.</p>
+          <h3 style="margin-top:14px">Se detiene una compra legitima</h3>
+          <p>Se paga la revision y se suma un costo mas difuso, el de haber bloqueado a un cliente que no hizo nada. Llamado, reposicion de tarjeta y riesgo de que se lleve su consumo a otra entidad.</p>
+        </div>
+      </div>
+      <p>Poner numero a esas cuatro situaciones exige cuatro parametros que el negocio conoce y que no salen de los datos. Todas las cifras de este informe dependen de ellos, asi que conviene revisarlos antes de leer cualquier resultado.</p>
+      <div class="tabla-envoltura">
+        <table>
+          <caption>Los valores usados en este informe. Estan declarados en <span class="mono">src/config.py</span> y cambiarlos recalcula todo el analisis.</caption>
+          <thead>
+            <tr><th>Parametro</th><th>Valor</th><th>Que representa</th><th>De donde deberia salir</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Costo de revisar una alerta</td><td>4</td>
+              <td>El tiempo de analista que consume investigar una operacion detenida</td>
+              <td>Costo laboral por caso, medible con datos internos</td>
+            </tr>
+            <tr>
+              <td>Costo de bloquear a un cliente legitimo</td><td>25</td>
+              <td>La molestia al cliente cuando se detiene una compra valida</td>
+              <td class="marca-riesgo">El mas incierto de los cuatro. Requiere una decision del area comercial</td>
+            </tr>
+            <tr>
+              <td>Fraccion del monto que se recupera</td><td>0,85</td>
+              <td>Cuanto dinero se rescata cuando el fraude se detecta a tiempo</td>
+              <td>Historico de recuperos de la entidad</td>
+            </tr>
+            <tr>
+              <td>Cargo por contracargo</td><td>15</td>
+              <td>Lo que cuesta procesar la disputa de una operacion fraudulenta</td>
+              <td>Tarifario de la red, es un dato cerrado</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:12px">Las cifras monetarias del informe estan en la unidad del conjunto de datos, que su publicador no documento. Lo que se puede trasladar a otra operacion son las proporciones, no los montos absolutos.</p>
+    </section>
+
+
+    <section>
+      <div class="tag">TX.FRAUD.KPI</div>
+      <h2>El resultado</h2>
+      <p class="sub">Medido una sola vez sobre las ultimas 7,7 horas del periodo, 56.962 operaciones con 75 fraudes. Los dos sistemas se calibraron con los mismos datos previos y ninguno vio este tramo.</p>
+      <div class="tabla-envoltura" style="margin-bottom:16px">
+        <table>
+          <thead>
+            <tr><th>Indicador</th><th>Modelo</th><th>Motor de reglas</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Perdida evitable que se evita</td>
+              <td class="marca-patina">54&nbsp;%</td><td>20&nbsp;%</td>
+            </tr>
+            <tr>
+              <td>Monto fraudulento interceptado</td>
+              <td class="marca-patina">65&nbsp;%</td><td>50&nbsp;%</td>
+            </tr>
+            <tr>
+              <td>Fraudes detectados de cada 100</td>
+              <td>73</td><td>71</td>
+            </tr>
+            <tr>
+              <td>Alertas correctas de cada 100</td>
+              <td>95</td><td>43</td>
+            </tr>
+            <tr>
+              <td>Alertas por dia</td>
+              <td>182</td><td>389</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="rejilla k3">
+        <div class="panel">
+          <div class="cifra patina">43&nbsp;%</div>
+          <div class="pie">Menos de lo que hoy cuesta el fraude, contando el dinero perdido y el costo de operar la revision. Equivale a 34 puntos mas de perdida evitada.</div>
+          <span class="inst">COST.REDUCTION</span>
+        </div>
+        <div class="panel cobre">
+          <div class="cifra cobre">2,1&nbsp;<small>veces menos</small></div>
+          <div class="pie">Alertas diarias que el motor de reglas, con mas fraude interceptado. Menos carga para el equipo de revision.</div>
+          <span class="inst">ALERT.LOAD</span>
+        </div>
+        <div class="panel gris">
+          <div class="cifra">17&nbsp;% a 79&nbsp;%</div>
+          <div class="pie">Rango de perdida evitada entre los 6 periodos del backtest. El promedio es 49&nbsp;%.</div>
+          <span class="inst">BACKTEST.RANGE</span>
+        </div>
+      </div>
+      <p style="margin-top:16px">La diferencia de precision es la que mas se siente en la operacion diaria. De cada 100 alertas que levanta el modelo, 95 corresponden a fraude real; en el motor de reglas son 43. Un analista que revisa la cola del modelo encuentra fraude la mayoria de las veces, y esa es la diferencia entre un sistema que el equipo usa y uno que aprende a ignorar.</p>
+    </section>
+
+
+    <section>
+      <div class="tag">COST.BREAKDOWN</div>
+      <h2>A donde va el dinero</h2>
+      <p class="sub">Costo de operar el modelo durante la ventana de prueba, 7,7 horas y 56.962 operaciones.</p>
+      <p>El costo total no es una sola cosa. Se reparte entre el fraude que se escapa, la parte del fraude detectado que ya no se alcanza a recuperar, y lo que cuesta operar la cola de revision con sus errores. Verlo desagregado muestra donde conviene trabajar.</p>
+      <div class="tabla-envoltura" style="margin-bottom:18px">
+        <table>
+          <caption>Como se compone el costo de operar el modelo.</caption>
+          <thead>
+            <tr><th>Concepto</th><th>Monto</th><th>De donde sale</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Fraude no detectado</td><td class="marca-riesgo">2.979</td><td>20 operaciones que pasaron completas, mas su contracargo</td></tr>
+            <tr><td>Fraude detectado y no recuperado</td><td>758</td><td>La fraccion del monto que no se rescata aun detectando a tiempo</td></tr>
+            <tr><td>Revision de alertas</td><td>232</td><td>58 alertas investigadas</td></tr>
+            <tr><td>Bloqueos a clientes legitimos</td><td>75</td><td>3 compras validas detenidas</td></tr>
+            <tr class="destacada"><td>Costo total con el modelo</td><td>4.044</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Casi todo el costo remanente esta en la primera fila. Operar la cola de revision, entre investigar alertas y compensar bloqueos equivocados, representa una fraccion menor del total. El margen de mejora esta en detectar mas fraude, no en abaratar la operacion.</p>
+      <h2 style="margin-top:26px">Cuanto se ahorra y frente a que</h2>
+      <p>Hay tres escenarios posibles y conviene no confundirlos. Aprobar todo sin ningun control es el techo teorico de la perdida, no una alternativa que alguien opere. El motor de reglas es lo que la entidad gasta hoy. El modelo es la propuesta.</p>
+      <div class="tabla-envoltura">
+        <table>
+          <thead>
+            <tr><th>Escenario</th><th>Costo</th><th>Que representa</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Aprobar todo sin control</td><td>8.854</td><td>Exposicion total al fraude de la ventana. Techo de lo que se puede evitar</td></tr>
+            <tr><td>Motor de reglas</td><td>7.065</td><td class="marca-cobre">El costo que la entidad tiene hoy</td></tr>
+            <tr class="destacada"><td>Modelo</td><td>4.044</td><td>La propuesta</td></tr>
+            <tr class="destacada">
+              <td>Ahorro frente al costo actual</td>
+              <td class="marca-patina">3.022</td>
+              <td>43&nbsp;% menos de lo que hoy cuesta el fraude</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:12px">La ultima fila es el caso de negocio. Reemplazar el motor de reglas por el modelo reduce en 43&nbsp;% lo que la entidad gasta hoy por fraude, contando tanto el dinero perdido como el costo de operar la revision. Visto sobre la exposicion total, el modelo evita 54&nbsp;% de la perdida y el motor de reglas 20&nbsp;%, una diferencia de 34 puntos.</p>
+    </section>
+
+
+    <section>
+      <div class="tag">BACKTEST.WF</div>
+      <h2>Que tan estable es el resultado</h2>
+      <p class="sub">La medicion anterior corresponde a un unico tramo del periodo. Este ejercicio repite la evaluacion a lo largo de toda la ventana para ver si el resultado se sostiene.</p>
+      <p>El procedimiento imita lo que haria la operacion real. Se recorre la linea de tiempo hacia adelante y en cada paso el modelo se reentrena con toda la historia disponible hasta ese momento, se recalibra el punto de corte con el tramo mas reciente, y se decide sobre el periodo siguiente sin volver a mirarlo. Nada de lo que ocurre en un periodo se usa para decidir en ese mismo periodo.</p>
+      <div class="rejilla k2">
+        <div class="tabla-envoltura">
+          <table>
+            <caption>Perdida evitada por periodo. El modelo supera al motor de reglas en los 6 tramos, con una ventaja minima de 17,0 puntos.</caption>
+            <thead>
+              <tr><th>Periodo</th><th>Fraudes</th><th>Corte</th><th>Modelo</th><th>Reglas</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>74</td><td class="mono">0,98</td><td>54,6&nbsp;%</td><td class="marca-riesgo">&minus;15,9&nbsp;%</td></tr>
+              <tr><td>2</td><td>30</td><td class="mono">0,26</td><td>16,9&nbsp;%</td><td class="marca-riesgo">&minus;232,6&nbsp;%</td></tr>
+              <tr><td>3</td><td>29</td><td class="mono">0,98</td><td>51,0&nbsp;%</td><td class="marca-riesgo">&minus;29,3&nbsp;%</td></tr>
+              <tr><td>4</td><td>29</td><td class="mono">0,94</td><td>79,2&nbsp;%</td><td class="marca-riesgo">&minus;37,8&nbsp;%</td></tr>
+              <tr><td>5</td><td>49</td><td class="mono">0,98</td><td>41,5&nbsp;%</td><td class="">24,5&nbsp;%</td></tr>
+              <tr><td>6</td><td>21</td><td class="mono">0,72</td><td>52,2&nbsp;%</td><td class="">25,0&nbsp;%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div class="panel gris" style="margin-bottom:16px">
+            <h3>La dispersion importa</h3>
+            <p>El promedio es 49,2&nbsp;%, pero los periodos van de 16,9&nbsp;% a 79,2&nbsp;%. Un sistema que rinde parejo y otro que alterna entre esos dos extremos no son el mismo producto, aunque su promedio coincida.</p>
+            <p>Antes de comprometer una cifra conviene decidir si se promete el promedio o el piso.</p>
+          </div>
+          <div class="panel cobre">
+            <h3>El punto de corte se mueve</h3>
+            <p>La recalibracion lo lleva entre 0,26 y 0,98 segun el periodo. Recalibrar de forma periodica no es un refinamiento opcional, es parte de la operacion.</p>
+          </div>
+        </div>
+      </div>
+      <div class="aviso" style="margin-top:16px">
+        <strong>Alcance de esta evidencia.</strong> El conjunto de datos cubre dos dias, de modo que cada periodo abarca horas y contiene entre 21 y 74 fraudes. El procedimiento es el que corresponde, pero para sostener una promesa de negocio hace falta repetirlo sobre meses de operacion.
+      </div>
+    </section>
+
+
+    <section>
+      <div class="tag">OPS.ENVELOPE</div>
+      <h2>Que se le puede exigir al modelo</h2>
+      <p class="sub">La capacidad del equipo de revision y la precision minima que este dispuesto a tolerar no las decide el area de datos. Vienen dadas, y cada una tiene un precio.</p>
+      <p>El punto de operacion elegido genera 182 alertas por dia. Si el equipo puede revisar menos, hay que subir el corte y se pierde deteccion. Si se le exige que casi todas las alertas sean fraude real, tambien. Las dos tablas cuantifican ese intercambio, tomando como referencia el mejor resultado sin restricciones.</p>
+      <div class="rejilla k2">
+        <div class="tabla-envoltura">
+          <table>
+            <caption>Segun cuantas alertas por dia pueda absorber la operacion.</caption>
+            <thead>
+              <tr><th>Alertas/dia</th><th>Correctas de 100</th><th>Fraudes</th><th>Monto</th><th>Del optimo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>25</td><td>100</td><td>11&nbsp;%</td><td>6&nbsp;%</td><td>11&nbsp;%</td></tr>
+              <tr><td>50</td><td>100</td><td>21&nbsp;%</td><td>17&nbsp;%</td><td>27&nbsp;%</td></tr>
+              <tr><td>100</td><td>100</td><td>43&nbsp;%</td><td>42&nbsp;%</td><td>65&nbsp;%</td></tr>
+              <tr><td>150</td><td>98</td><td>63&nbsp;%</td><td>49&nbsp;%</td><td>77&nbsp;%</td></tr>
+              <tr><td>200</td><td>89</td><td>76&nbsp;%</td><td>66&nbsp;%</td><td>99&nbsp;%</td></tr>
+              <tr><td>400</td><td>48</td><td>81&nbsp;%</td><td>77&nbsp;%</td><td>79&nbsp;%</td></tr>
+              <tr><td>800</td><td>24</td><td>83&nbsp;%</td><td>77&nbsp;%</td><td>3&nbsp;%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tabla-envoltura">
+          <table>
+            <caption>Segun la precision minima que exija el equipo para confiar en la cola.</caption>
+            <thead>
+              <tr><th>Correctas de 100</th><th>Fraudes</th><th>Alertas/dia</th><th>Del optimo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>50</td><td>73&nbsp;%</td><td>182</td><td>100&nbsp;%</td></tr>
+              <tr><td>75</td><td>73&nbsp;%</td><td>182</td><td>100&nbsp;%</td></tr>
+              <tr><td>90</td><td>73&nbsp;%</td><td>182</td><td>100&nbsp;%</td></tr>
+              <tr><td>95</td><td>59&nbsp;%</td><td>138</td><td>76&nbsp;%</td></tr>
+              <tr><td>99</td><td>59&nbsp;%</td><td>138</td><td>76&nbsp;%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="aviso" style="margin-top:16px">
+        <strong>El techo del sistema.</strong> El maximo monto fraudulento que este modelo puede interceptar sin que la operacion deje de ahorrar dinero es 77&nbsp;%, y en el punto elegido intercepta 65&nbsp;%. Si la politica de riesgo exige mas que eso, la respuesta no esta en mover el punto de corte sino en conseguir informacion que hoy no esta disponible.
+      </div>
+    </section>
+
+
+    <section>
+      <div class="tag">DECISION</div>
+      <h2>La recomendacion</h2>
+      <div class="rejilla k2">
+        <div class="panel">
+          <h3>Que conviene hacer</h3>
+          <p>Reemplazar el motor de reglas por el modelo, alertando cuando la probabilidad estimada supera 0,96. Sobre la ventana evaluada eso reduce en 43&nbsp;% lo que hoy cuesta el fraude y ademas baja las alertas diarias de 389 a 182, con lo cual libera tiempo del equipo de revision.</p>
+          <p>El motor de reglas conviene conservarlo en paralelo durante la transicion, porque su ventaja es que cualquiera puede explicar por que detuvo una operacion.</p>
+        </div>
+        <div class="panel cobre">
+          <h3>Con que salvedades</h3>
+          <p>La evidencia cubre dos dias. El backtest muestra periodos de 17&nbsp;% y de 79&nbsp;%, asi que la cifra que se comprometa deberia ser conservadora y revisarse con datos de varios meses.</p>
+          <p>El punto de corte requiere recalibracion periodica, y los cuatro supuestos de costo deberian confirmarse con datos internos de la entidad antes de fijar objetivos.</p>
+        </div>
+      </div>
+      <p style="margin-top:16px">Para ir mas alla de 77&nbsp;% del monto fraudulento hace falta informacion que este conjunto de datos no tiene, en particular el identificador de tarjeta que permite construir el historial de comportamiento de cada cliente. Ese es el proximo paso con mayor impacto esperado, y es un pedido de datos antes que un problema de modelado.</p>
+    </section>
+
+
+    <section>
+      <div class="tag">LIMITS.DECLARED</div>
+      <h2>Lo que este ejercicio no resuelve</h2>
+      <div class="rejilla k2">
+        <div class="panel gris">
+          <h3>No explica sus decisiones</h3>
+          <p>Las variables del conjunto de datos estan anonimizadas mediante una transformacion que las vuelve ilegibles. El modelo ordena bien las operaciones pero no puede decirle a un analista por que marco una en particular, y sin esa explicacion una cola de revision es dificil de operar.</p>
+          <h3 style="margin-top:14px">No conoce al cliente</h3>
+          <p>No hay identificador de tarjeta ni de comercio, asi que no se puede saber cuantas compras hizo esa tarjeta en la ultima hora ni si el monto se aparta de su costumbre. Son las senales mas usadas en los sistemas reales y son justamente las que reconocerian a los 13 fraudes que el modelo hoy no ve.</p>
+        </div>
+        <div class="panel gris">
+          <h3>Los montos no se anualizan</h3>
+          <p>Las cifras corresponden a unas horas de operacion de un emisor europeo en 2013, en una unidad monetaria que el publicador no documento. Multiplicarlas por 365 supondria que el volumen, la composicion del fraude y la moneda se mantienen. Las proporciones se pueden trasladar, los montos absolutos no.</p>
+          <h3 style="margin-top:14px">La muestra es corta</h3>
+          <p>Quedan 75 fraudes en el tramo de prueba, de modo que un solo caso mueve el resultado mas de un punto. Cualquier diferencia pequena entre dos alternativas cae dentro del ruido de la medicion.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <div class="estriado claro" style="margin:8px 0 26px"></div>
+    <section>
+      <div class="tag">ANEXO</div>
+      <h2>Como se construyo</h2>
+      <p class="sub">Lo que sigue documenta el metodo para quien quiera auditarlo. El informe ejecutivo termina en la seccion anterior.</p>
+    </section>
+
+
+    <section>
+      <div class="tag">PIPE.FLOW</div>
+      <h2>El orden de los pasos</h2>
+      <p class="sub">El tramo de prueba se aparta al principio y se mide una sola vez, al final. Ese orden es lo que sostiene la validez del resultado.</p>
+      <div class="flujo">
+        <svg viewBox="0 0 980 100" role="img" aria-label="Secuencia de pasos, desde el corte temporal hasta el backtest">
+          <defs>
+            <style>
+              .nodo { fill: #0E7C68; }
+              .pista { stroke: #0E7C68; stroke-width: 2; fill: none; }
+              .etq { font-family: "Inter", system-ui, sans-serif; font-size: 12px; fill: #0A0E14; }
+              .etq-s { font-family: "JetBrains Mono", monospace; font-size: 9.5px; fill: #5B6673; }
+              .caja { fill: #FFFFFF; stroke: #E3E7EC; }
+            </style>
+          </defs>
+          <path class="pista" d="M156 44 H170" />
+          <path class="pista" d="M318 44 H332" />
+          <path class="pista" d="M480 44 H494" />
+          <path class="pista" d="M642 44 H656" />
+          <path class="pista" d="M804 44 H818" />
+          <circle class="nodo" cx="170" cy="44" r="4" />
+          <circle class="nodo" cx="332" cy="44" r="4" />
+          <circle class="nodo" cx="494" cy="44" r="4" />
+          <circle class="nodo" cx="656" cy="44" r="4" />
+          <circle class="nodo" cx="818" cy="44" r="4" />
+          <g>
+            <rect class="caja" x="8" y="26" width="148" height="36" rx="3" />
+            <text class="etq" x="82" y="42" text-anchor="middle">Corte temporal</text>
+            <text class="etq-s" x="82" y="55" text-anchor="middle">PASADO / FUTURO</text>
+          </g>
+          <g>
+            <rect class="caja" x="170" y="26" width="148" height="36" rx="3" />
+            <text class="etq" x="244" y="42" text-anchor="middle">Predictores</text>
+            <text class="etq-s" x="244" y="55" text-anchor="middle">31 COLUMNAS</text>
+          </g>
+          <g>
+            <rect class="caja" x="332" y="26" width="148" height="36" rx="3" />
+            <text class="etq" x="406" y="42" text-anchor="middle">5 candidatos</text>
+            <text class="etq-s" x="406" y="55" text-anchor="middle">VENTANA EXPANSIVA</text>
+          </g>
+          <g>
+            <rect class="caja" x="494" y="26" width="148" height="36" rx="3" />
+            <text class="etq" x="568" y="42" text-anchor="middle">Corte por costo</text>
+            <text class="etq-s" x="568" y="55" text-anchor="middle">EN VALIDACION</text>
+          </g>
+          <g>
+            <rect class="caja" x="656" y="26" width="148" height="36" rx="3" />
+            <text class="etq" x="730" y="42" text-anchor="middle">Medicion final</text>
+            <text class="etq-s" x="730" y="55" text-anchor="middle">UNA SOLA VEZ</text>
+          </g>
+          <g>
+            <rect class="caja" x="818" y="26" width="148" height="36" rx="3" />
+            <text class="etq" x="892" y="42" text-anchor="middle">Backtest</text>
+            <text class="etq-s" x="892" y="55" text-anchor="middle">6 PERIODOS</text>
+          </g>
+          <text class="etq-s" x="8" y="86">EL TRAMO DE PRUEBA QUEDA APARTADO DESDE EL PRIMER PASO Y NO PARTICIPA DE NINGUNA DECISION</text>
+        </svg>
+      </div>
+    </section>
+
+
+    <section>
+      <div class="tag">LOSS.SELECT</div>
+      <h2>Como se elige que optimiza el modelo</h2>
+      <p class="sub">Cinco alternativas, cada una entrenada con una definicion distinta de que error es mas grave. Se comparan por el dinero que ahorran, no por su exactitud.</p>
+      <p>Un modelo aprende minimizando una penalidad, y esa penalidad se puede escribir de varias formas. La mas simple castiga igual todos los errores. Otra castiga mas el fraude no detectado que la falsa alarma, para compensar que el fraude es rarisimo. Una tercera castiga cada error en proporcion al dinero que estaba en juego en esa operacion. Cada alternativa produce un modelo distinto y la pregunta es cual deja mas dinero en la entidad.</p>
+      <p>Para responderla se recorre la historia hacia adelante en varios tramos. En cada uno se entrena con el pasado, se fija el punto de corte con el tramo mas reciente de ese pasado, y se mide el ahorro sobre el tramo siguiente. El promedio de esos tramos es la columna principal de la tabla.</p>
+      <div class="rejilla k2" style="margin-top:16px">
+        <div class="tabla-envoltura">
+          <table>
+            <caption>Ordenadas por el ahorro promedio. La desviacion indica cuanto varia ese ahorro entre tramos.</caption>
+            <thead>
+              <tr><th>Penalidad</th><th>Ahorro</th><th>Desv.</th><th>Monto</th><th>Alertas/dia</th></tr>
+            </thead>
+            <tbody>
+              <tr class="destacada"><td>Pesos por clase</td><td>57,1&nbsp;%</td><td>7,8</td><td>72,4&nbsp;%</td><td>216</td></tr>
+              <tr><td>Pesos por monto, reequilibrados</td><td>55,6&nbsp;%</td><td>7,4</td><td>70,6&nbsp;%</td><td>214</td></tr>
+              <tr><td>Sin ponderar</td><td>54,9&nbsp;%</td><td>9,8</td><td>68,9&nbsp;%</td><td>180</td></tr>
+              <tr><td>Pesos por monto</td><td>45,3&nbsp;%</td><td>9,6</td><td>58,3&nbsp;%</td><td>195</td></tr>
+              <tr><td>Referencia lineal</td><td>38,2&nbsp;%</td><td>6,2</td><td>69,1&nbsp;%</td><td>456</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel gris">
+          <h3>Como se lee</h3>
+          <p>La ganadora aventaja a la segunda por 1,4 puntos, con desviaciones de alrededor de 8. La diferencia es menor que la variabilidad entre tramos, asi que las dos primeras son equivalentes con esta cantidad de datos y elegir entre ellas es cuestion de simplicidad.</p>
+          <p>Pesar cada error por el monto en juego parece la idea correcta, y lo es, pero solo funciona si ademas se compensa la rareza del fraude. Sin esa correccion pierde 10,3 puntos, porque con un fraude cada 579 operaciones la escasez pesa mas que el monto.</p>
+          <p>La referencia lineal muestra por que hace falta mirar mas de una columna. Intercepta 69&nbsp;% del monto, casi tanto como la ganadora, y sin embargo ahorra bastante menos. La razon esta en sus 456 alertas diarias, que se pagan en revision y en clientes molestados.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <section>
+      <div class="tag">THR.ECON</div>
+      <h2>Como se fija el punto de corte</h2>
+      <p class="sub">El modelo no responde si una operacion es fraude. Entrega una probabilidad, y hace falta decidir a partir de que valor conviene alertar.</p>
+      <p>Para cada operacion el modelo devuelve un numero entre 0 y 1 que expresa cuan sospechosa la considera. Convertir ese numero en una decision requiere fijar un limite. Se suele usar 0,5 por costumbre, y ese valor no tiene ningun fundamento. Solo seria correcto si equivocarse en una direccion costara exactamente lo mismo que equivocarse en la otra, y en fraude no es asi.</p>
+      <p>El limite correcto sale de comparar costos. Para cada valor posible se calcula que pasaria con todas las operaciones del tramo de calibracion, cuanto fraude se detendria, cuantos clientes legitimos quedarian bloqueados, y cuanto costaria el total. El limite elegido es el que minimiza ese costo respetando la capacidad de revision, y en este caso resulta 0,96.</p>
+      <p>La referencia para juzgar ese costo es lo que gasta hoy el motor de reglas. Cualquier umbral por debajo de esa linea mejora la situacion actual, y el elegido es el que la mejora mas.</p>
+      <div class="rejilla k2" style="margin-top:16px">
+        <figure>
+          <img src="../reports/figures/cost-vs-threshold.png" alt="Costo total y alertas por dia frente al punto de corte" />
+          <figcaption>La linea roja es lo que cuesta hoy el motor de reglas. La franja verde marca los umbrales donde el modelo cuesta menos que el sistema actual, y el minimo queda en 0,96. El panel inferior muestra cuantas alertas genera cada valor.</figcaption>
+        </figure>
+        <div>
+          <div class="panel cobre" style="margin-bottom:16px">
+            <h3>Por que queda tan alto</h3>
+            <p>El modelo reparte sus probabilidades de forma muy polarizada. A la mayoria de los fraudes les asigna un valor cercano a 1 y a un grupo pequeno les asigna practicamente 0, con muy pocos casos en el medio.</p>
+            <p>La consecuencia practica es que bajar el limite casi no agrega fraudes detectados, porque no hay casos esperando justo debajo, y en cambio multiplica los bloqueos a clientes legitimos. Alertar mas seria mas caro sin ser mas efectivo.</p>
+          </div>
+          <div class="aviso">
+            <strong>El limite no es el problema.</strong> Los fraudes que reciben probabilidad casi nula representan 23&nbsp;% del monto fraudulento del tramo. Ningun valor de corte los recupera, porque el modelo no los distingue de una compra normal. Lo que falta es informacion, no una decision distinta.
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section>
+      <div class="tag">SENS.PARAM</div>
+      <h2>Cuanto depende el resultado de los supuestos</h2>
+      <p class="sub">Dos de los cuatro parametros de costo son estimaciones, no mediciones. Si la recomendacion cambiara al mover esos numeros, no seria una recomendacion.</p>
+      <p>El mas discutible es el costo de bloquear a un cliente legitimo, porque no existe una fuente publica que lo cuantifique. Le sigue el costo de revisar una alerta, que depende de como este organizado el equipo. La prueba consiste en recalcular el punto de corte optimo variando esos supuestos y observar si la decision se mantiene.</p>
+      <div class="rejilla k3">
+        <div class="panel gris">
+          <h3>Variando uno solo</h3>
+          <p>Llevando el costo de bloquear un cliente de 0 a 100, el punto de corte se queda en 0,96 en practicamente todo el rango. Variando el costo de revision de 0 a 8, no se mueve nada.</p>
+        </div>
+        <div class="panel gris">
+          <h3>Variando los dos</h3>
+          <p>Como los dos no pueden ser irrelevantes al mismo tiempo, se recorre la combinacion completa. El punto de corte solo baja en las 1 combinaciones donde uno de los dos costos es exactamente cero y el otro es minimo, y aun ahi el resultado mejora en dos fraudes.</p>
+        </div>
+        <div class="panel cobre">
+          <h3>Que significa</h3>
+          <p>La decision se sostiene en todo el rango de supuestos que describe una operacion real, y solo cambiaria si revisar alertas y molestar clientes fueran ambos gratuitos. La recomendacion no depende de los numeros mas debiles del analisis.</p>
+          <p>El corolario tambien es util. Discutir estos parametros con el negocio no va a cambiar el resultado, porque lo que falta son predictores.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="estriado claro"></div>
+  <div class="cierre">
+    <p class="frase">Un modelo de fraude no se elige por lo que acierta, sino por lo que cuesta equivocarse.</p>
+  </div>
+
+  <div class="firma">
+    <div class="autor">
+      <img src="../assets/daniel-hurtado.jpg" alt="" />
+      <span>
+        <span class="nombre">Daniel Hurtado</span>
+        <span class="rol">Economista y cientifico de datos</span>
+      </span>
+    </div>
+    <div class="derechos">
+      &copy; 2026 DANIEL HURTADO<br />
+      CODIGO BAJO LICENCIA MIT
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

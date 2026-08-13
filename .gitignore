@@ -1,0 +1,43 @@
+# Datos. El CSV pesa 144 MB y se reconstruye con python -m src.train.
+data/*
+!data/.gitkeep
+
+# Artefactos de entrenamiento. reports/metrics.json si se versiona, porque es el
+# respaldo de cada cifra que afirma el README.
+models/*.pkl
+models/*.joblib
+models/*.onnx
+
+# Credenciales y configuracion de nube
+config.json
+.env
+.env.*
+*.pem
+*.key
+credentials*
+.azureml/
+.aws/
+.kaggle/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Editores y sistema
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
